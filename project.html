@@ -1,0 +1,74 @@
+<html>
+<head> <meta charset="utf-8"/></head>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style> 
+	path {stroke: black;}
+	#tooltip {
+                opacity: 0;
+                position: absolute;
+                text-align: center;
+                width: 50px;
+                height: 40px;
+                border: 0px;
+        }
+</style>
+<body onload='init()'>
+<svg width=500 height=500>
+</svg>
+<div id="tooltip"></div>
+<script>
+
+var data;
+
+async function init() {
+	await d3.csv("unemployment.csv").then(function(_data) {
+    	_data.forEach(function(d) {
+       		d.year_2010 = +d.year_2010;
+       		d.year_2011 = +d.year_2011;
+       		d.year_2012 = +d.year_2012;
+       		d.year_2013 = +d.year_2013;
+       		d.year_2014 = +d.year_2014;
+       		
+   		});
+    	data = _data;
+	});
+
+
+//console.log(data[0]);
+var year = [2010, 2011, 2012, 2013, 2014];
+
+var margin = 50;
+var graphLength = 400;
+var x = d3.scaleBand().domain([2010,2011,2012,2013,2014]).range([0, graphLength]);
+var y = d3.scaleLinear().domain([0,60]).range([graphLength, 0]);
+
+var valueline = d3.line()
+				.x(function(d, i) {return year[i]})
+				.y(function(d, i) { return y(d.year_2010); });
+
+var tooltip = d3.select("#tooltip");
+
+d3.select("svg")
+        .append("g")
+        .attr("transform", "translate(50, 450)")
+        .call(d3.axisBottom(x));
+
+d3.select("svg")
+        .append("g")
+        .attr("transform", "translate(50, 50)")
+        .call(d3.axisLeft(y));
+
+//console.log(data);
+d3.select("svg")
+	.append("g")
+	//.attr("transform", "translate(50, 50)")
+	.selectAll("path")
+	.data(data)
+	.enter()
+	.append("path")
+	.attr("class", "line")
+	.attr("d", valueline);
+}
+</script>
+</body>
+</html>
